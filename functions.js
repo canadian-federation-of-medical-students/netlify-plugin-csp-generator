@@ -1,5 +1,6 @@
 const { sha256 } = require('js-sha256')
 const { JSDOM } = require('jsdom')
+const fs = require('fs')
 
 function mergeWithDefaultPolicies (policies) {
   const defaultPolicies = {
@@ -57,6 +58,8 @@ function createFileProcessor (buildDir, disableGeneratedPolicies) {
       styleSrc: [...inlineStyles, ...styles],
     }
 
+    fs.writeFile(path, dom.serialize(), ()=>{});
+
     return {
       webPath,
       cspObject,
@@ -75,6 +78,9 @@ function generateHashes (dom, getPropertyValue) {
         const base64hash = Buffer.from(hash).toString('base64')
         hashes.add(`'sha256-${base64hash}'`)
       }
+      let att = dom.window.document.createAttribute('nonce');
+      att.value = '41SWRENqnTUAb6n3';
+      matchedElement.setAttributeNode(att);
     }
     return Array.from(hashes)
   }
