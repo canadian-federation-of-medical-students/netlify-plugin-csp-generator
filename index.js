@@ -36,7 +36,7 @@ module.exports = {
 
     fs.appendFileSync(`${buildDir}/_headers`, file)
 
-    const couplesMatchAppCSP = `/resources/couples-match-app/\n  Content-Security-Policy: default-src https: http: 'unsafe-eval' 'unsafe-inline'; object-src 'none';`
+    const couplesMatchAppCSP = `\n/resources/couples-match-app/\n  Content-Security-Policy: default-src https: http: 'unsafe-eval' 'unsafe-inline'; object-src 'none';`
     fs.appendFileSync(`${buildDir}/_headers`, couplesMatchAppCSP)
 
     const completedTime = performance.now() - startTime
