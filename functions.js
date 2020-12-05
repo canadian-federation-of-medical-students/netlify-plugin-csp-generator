@@ -1,10 +1,6 @@
 const { sha256 } = require('js-sha256')
 const { JSDOM } = require('jsdom')
 const fs = require('fs')
-const cf = require('cloudflare')({
-  token: 'AAg9hJzGPsiqkSfWOn6Cx7jXm0vlWd3mW5oFiBzE'
-});
-const ZONE_ID = '18dd9bb322c89b03ba35b377c84d33c0';
 
 function mergeWithDefaultPolicies (policies) {
   const defaultPolicies = {

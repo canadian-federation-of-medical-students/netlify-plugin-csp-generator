@@ -2,6 +2,8 @@ const fs = require('fs')
 const { performance } = require('perf_hooks')
 const globby = require('globby')
 
+const ZONE_ID = '18dd9bb322c89b03ba35b377c84d33c0';
+
 const { mergeWithDefaultPolicies, createFileProcessor, buildCSPArray, splitToGlobalAndLocal } = require('./functions.js')
 
 module.exports = {
@@ -27,7 +29,7 @@ module.exports = {
         cloudflare_paths.push(res)
       }
     })
-    for (const path of cloudflare_paths) console.log(`Path: ${path.split('index')[0]}`)
+
     console.info(`Found ${paths.length} HTML ${paths.length === 1 ? 'file' : 'files'}`)
 
     const processFile = createFileProcessor(buildDir, disableGeneratedPolicies)
