@@ -17,6 +17,17 @@ module.exports = {
 
     const lookup = [htmlFiles].concat(excludeFiles)
     const paths = await globby(lookup)
+    const cloudflare_paths = []
+    paths.forEach(path => {
+      let res = `https://*.cfms.org/${path.split('.html')[0].split('serve/')[1]}`
+      if (res.includes('/index')) {
+        cloudflare_paths.push(res.split('/index')[0])
+        cloudflare_paths.push(res.split('index')[0])
+      } else {
+        cloudflare_paths.push(res)
+      }
+    })
+    for (const path of cloudflare_paths) console.log(`Path: ${path.split('index')[0]}`)
     console.info(`Found ${paths.length} HTML ${paths.length === 1 ? 'file' : 'files'}`)
 
     const processFile = createFileProcessor(buildDir, disableGeneratedPolicies)
