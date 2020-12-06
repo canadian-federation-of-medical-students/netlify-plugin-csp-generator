@@ -1,6 +1,10 @@
 const { sha256 } = require('js-sha256')
 const { JSDOM } = require('jsdom')
 const fs = require('fs')
+const axios = require('axios')
+
+const ZONE_ID = '';
+const CLOUDFLARE_TOKEN = '';
 
 function mergeWithDefaultPolicies (policies) {
   const defaultPolicies = {
@@ -38,6 +42,7 @@ function createFileProcessor (buildDir, disableGeneratedPolicies) {
 
     const scripts = shouldGenerate('scriptSrc') ? generateHashesFromElement('script') : []
     const styles = shouldGenerate('styleSrc') ? generateHashesFromElement('style') : []
+    const linkedStyles = shouldGenerate('styleSrc') ? generateHashesFromElement('link[rel=stylesheet]') : []
     const inlineStyles = shouldGenerate('styleSrc') ? generateHashesFromStyle('[style]') : []
 
     const indexMatcher = new RegExp(`^${buildDir}(.*)index\\.html$`)
@@ -131,9 +136,45 @@ function mergeCSPObjects (mergeInto, index, mergeFrom) {
   return newObject
 }
 
+async function getCloudflareWorkerRoutes() {
+  const config = {
+    method: 'get',
+    url: `https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/workers/routes`,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': CLOUDFLARE_TOKEN,
+    }
+  };
+
+  const res = await axios(config)
+
+  return res.data.result
+}
+
+async function updateCloudflareWorkerRoutes(routes) {
+  const requests = [];
+
+  for (const route of routes) {
+    const data = JSON.stringify({"pattern":route,"script":"nonce"});
+    const config = {
+      method: 'post',
+      url: `https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/workers/routes`,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': CLOUDFLARE_TOKEN,
+      },
+      data : data
+    };
+    requests.push(axios(config))
+  }
+  return await axios.all(requests)
+}
+
 module.exports = {
   mergeWithDefaultPolicies,
   createFileProcessor,
   buildCSPArray,
   splitToGlobalAndLocal,
+  getCloudflareWorkerRoutes,
+  updateCloudflareWorkerRoutes,
 }

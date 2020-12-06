@@ -2,9 +2,7 @@ const fs = require('fs')
 const { performance } = require('perf_hooks')
 const globby = require('globby')
 
-const ZONE_ID = '18dd9bb322c89b03ba35b377c84d33c0';
-
-const { mergeWithDefaultPolicies, createFileProcessor, buildCSPArray, splitToGlobalAndLocal } = require('./functions.js')
+const { mergeWithDefaultPolicies, createFileProcessor, buildCSPArray, splitToGlobalAndLocal, getCloudflareWorkerRoutes, updateCloudflareWorkerRoutes } = require('./functions.js')
 
 module.exports = {
   onPostBuild: async ({ inputs }) => {
@@ -21,16 +19,38 @@ module.exports = {
     const paths = await globby(lookup)
     const cloudflare_paths = []
     paths.forEach(path => {
-      let res = `https://*.cfms.org/${path.split('.html')[0].split('serve/')[1]}`
-      if (res.includes('/index')) {
-        cloudflare_paths.push(res.split('/index')[0])
-        cloudflare_paths.push(res.split('index')[0])
+      let res
+      let pname = path.split('serve/')[1].split('.html')[0]
+      if (pname.includes('/')) {
+        res = `${pname.split('/')[0]}/*`
       } else {
-        cloudflare_paths.push(res)
+        res = pname
+      }
+      if (!res.includes('index') && !res.includes('fonts') && !res.includes('files') && !res.includes('images')) {
+        const staging_pattern = `staging.cfms.org/${res}`
+        const production_pattern = `cfms.org/${res}`
+        if (!cloudflare_paths.includes(staging_pattern)) {
+          cloudflare_paths.push(staging_pattern)
+          cloudflare_paths.push(`https://${staging_pattern}`)
+        }
+        if (!cloudflare_paths.includes(production_pattern)) {
+          cloudflare_paths.push(production_pattern)
+          cloudflare_paths.push(`https://${production_pattern}`)
+        }
       }
     })
 
     console.info(`Found ${paths.length} HTML ${paths.length === 1 ? 'file' : 'files'}`)
+
+    // const cloudflare_routes = await getCloudflareWorkerRoutes()
+    // const updated_cloudflare_routes = cloudflare_paths.filter(function(path) {
+    //   return this.findIndex(e => e.pattern === path) < 0
+    // }, cloudflare_routes)
+    //
+    // if (Array.isArray(updated_cloudflare_routes) && updated_cloudflare_routes.length) {
+    //   console.log(updated_cloudflare_routes)
+    //   await updateCloudflareWorkerRoutes(updated_cloudflare_routes)
+    // }
 
     const processFile = createFileProcessor(buildDir, disableGeneratedPolicies)
 
