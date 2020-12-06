@@ -54,24 +54,26 @@ module.exports = {
 
     const processFile = createFileProcessor(buildDir, disableGeneratedPolicies)
 
-    await Promise.all( paths.map(path => fs.promises.readFile(path, 'utf-8').then(processFile(path))) )
+    const processedFileHeaders = await Promise.all(
+      paths.map(path => fs.promises.readFile(path, 'utf-8').then(processFile(path)))
+    )
 
-    // const { globalHeaders, localHeaders } = processedFileHeaders
-    //   .reduce(splitToGlobalAndLocal, { globalHeaders: [], localHeaders: [] })
-    //
-    // const file = globalHeaders.concat(...localHeaders)
-    //   .map(({ webPath, cspObject }) => {
-    //     const cspString = buildCSPArray(mergedPolicies, disablePolicies, cspObject).join(' ')
-    //     return `${webPath}\n  Content-Security-Policy: ${cspString}`
-    //   }).join('\n')
-    //
-    // fs.appendFileSync(`${buildDir}/_headers`, file)
-    //
-    // const unsafe_csp = "Content-Security-Policy: default-src https: http: data: 'unsafe-eval' 'unsafe-inline'; object-src 'none';"
-    // const couplesMatchAppCSP = `\n/resources/couples-match-app/*\n  ${unsafe_csp}\n/resources/health-human-resources-platform/*\n  ${unsafe_csp}`
-    // fs.appendFileSync(`${buildDir}/_headers`, couplesMatchAppCSP)
+    const { globalHeaders, localHeaders } = processedFileHeaders
+      .reduce(splitToGlobalAndLocal, { globalHeaders: [], localHeaders: [] })
+
+    const file = globalHeaders.concat(...localHeaders)
+      .map(({ webPath, cspObject }) => {
+        const cspString = buildCSPArray(mergedPolicies, disablePolicies, cspObject).join(' ')
+        return `${webPath}\n  Content-Security-Policy: ${cspString}`
+      }).join('\n')
+
+    fs.appendFileSync(`${buildDir}/_headers`, file)
+
+    const unsafe_csp = "Content-Security-Policy: default-src https: http: data: 'unsafe-eval' 'unsafe-inline'; object-src 'none';"
+    const couplesMatchAppCSP = `\n/resources/couples-match-app/*\n  ${unsafe_csp}\n/resources/health-human-resources-platform/*\n  ${unsafe_csp}`
+    fs.appendFileSync(`${buildDir}/_headers`, couplesMatchAppCSP)
 
     const completedTime = performance.now() - startTime
-    console.info(`Updated CSP headers - ${(completedTime / 1000).toFixed(2)} seconds`)
+    console.info(`Saved at ${buildDir}/_headers - ${(completedTime / 1000).toFixed(2)} seconds`)
   },
 }
