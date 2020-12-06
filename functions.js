@@ -46,6 +46,8 @@ function createFileProcessor (buildDir, disableGeneratedPolicies) {
 
     generateNonce('script')
     generateNonce('link[rel=stylesheet]')
+    generateNonce('style')
+    generateNonce('[style]')
     const styles = shouldGenerate('styleSrc') ? generateHashesFromElement('style') : []
     const inlineStyles = shouldGenerate('styleSrc') ? generateHashesFromStyle('[style]') : []
 
