@@ -48,49 +48,49 @@ function createFileProcessor (buildDir, disableGeneratedPolicies) {
     const linkedStyles = shouldGenerate('styleSrc') ? generateHashesFromElement('link[rel=stylesheet]') : []
     const inlineStyles = shouldGenerate('styleSrc') ? generateHashesFromStyle('[style]') : []
 
-    const indexMatcher = new RegExp(`^${buildDir}(.*)index\\.html$`)
-    const nonIndexMatcher = new RegExp(`^${buildDir}(.*\\/).*?\\.html$`)
-
-    let webPath = null
-    let globalCSP = null
-    if (path.match(indexMatcher)) {
-      webPath = path.replace(indexMatcher, '$1')
-      globalCSP = false
-    } else {
-      webPath = path.replace(nonIndexMatcher, '$1*')
-      globalCSP = true
-    }
-
-    const cspObject = {
-      scriptSrc: scripts,
-      styleSrc: [...inlineStyles, ...styles],
-    }
+    // const indexMatcher = new RegExp(`^${buildDir}(.*)index\\.html$`)
+    // const nonIndexMatcher = new RegExp(`^${buildDir}(.*\\/).*?\\.html$`)
+    //
+    // let webPath = null
+    // let globalCSP = null
+    // if (path.match(indexMatcher)) {
+    //   webPath = path.replace(indexMatcher, '$1')
+    //   globalCSP = false
+    // } else {
+    //   webPath = path.replace(nonIndexMatcher, '$1*')
+    //   globalCSP = true
+    // }
+    //
+    // const cspObject = {
+    //   scriptSrc: scripts,
+    //   styleSrc: [...inlineStyles, ...styles],
+    // }
 
     fs.writeFile(path, dom.serialize(), ()=>{});
 
-    return {
-      webPath,
-      cspObject,
-      globalCSP,
-    }
+    // return {
+    //   webPath,
+    //   cspObject,
+    //   globalCSP,
+    // }
   }
 }
 
 function generateHashes (dom, getPropertyValue) {
   return selector => {
-    const hashes = new Set()
+    // const hashes = new Set()
     for (const matchedElement of dom.window.document.querySelectorAll(selector)) {
-      const value = getPropertyValue(matchedElement)
-      if (value.length) {
-        const hash = sha256.arrayBuffer(value)
-        const base64hash = Buffer.from(hash).toString('base64')
-        hashes.add(`'sha256-${base64hash}'`)
-      }
+      // const value = getPropertyValue(matchedElement)
+      // if (value.length) {
+      //   const hash = sha256.arrayBuffer(value)
+      //   const base64hash = Buffer.from(hash).toString('base64')
+      //   hashes.add(`'sha256-${base64hash}'`)
+      // }
       let att = dom.window.document.createAttribute('nonce');
       att.value = '41SWRENqnTUAb6n3';
       matchedElement.setAttributeNode(att);
     }
-    return Array.from(hashes)
+    // return Array.from(hashes)
   }
 }
 
