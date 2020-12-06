@@ -69,7 +69,8 @@ module.exports = {
 
     fs.appendFileSync(`${buildDir}/_headers`, file)
 
-    const couplesMatchAppCSP = `\n/resources/couples-match-app/\n  Content-Security-Policy: default-src https: http: 'unsafe-eval' 'unsafe-inline'; object-src 'none';`
+    const unsafe_csp = "Content-Security-Policy: default-src https: http: data: 'unsafe-eval' 'unsafe-inline'; object-src 'none';"
+    const couplesMatchAppCSP = `\n/resources/couples-match-app/*\n  ${unsafe_csp}\n/resources/health-human-resources-platform/*\n  ${unsafe_csp}`
     fs.appendFileSync(`${buildDir}/_headers`, couplesMatchAppCSP)
 
     const completedTime = performance.now() - startTime
