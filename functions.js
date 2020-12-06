@@ -3,8 +3,11 @@ const { JSDOM } = require('jsdom')
 const fs = require('fs')
 const axios = require('axios')
 
-const ZONE_ID = '';
-const CLOUDFLARE_TOKEN = '';
+const ZONE_ID = process.env.ZONE_ID;
+const CLOUDFLARE_TOKEN = process.env.CLOUDFLARE_TOKEN;
+
+console.log(`Using cloudflare zone: ${ZONE_ID}`)
+console.log(`Using cloudflare token: ${CLOUDFLARE_TOKEN}`)
 
 function mergeWithDefaultPolicies (policies) {
   const defaultPolicies = {

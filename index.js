@@ -42,15 +42,15 @@ module.exports = {
 
     console.info(`Found ${paths.length} HTML ${paths.length === 1 ? 'file' : 'files'}`)
 
-    // const cloudflare_routes = await getCloudflareWorkerRoutes()
-    // const updated_cloudflare_routes = cloudflare_paths.filter(function(path) {
-    //   return this.findIndex(e => e.pattern === path) < 0
-    // }, cloudflare_routes)
-    //
-    // if (Array.isArray(updated_cloudflare_routes) && updated_cloudflare_routes.length) {
-    //   console.log(updated_cloudflare_routes)
-    //   await updateCloudflareWorkerRoutes(updated_cloudflare_routes)
-    // }
+    const cloudflare_routes = await getCloudflareWorkerRoutes()
+    const updated_cloudflare_routes = cloudflare_paths.filter(function(path) {
+      return this.findIndex(e => e.pattern === path) < 0
+    }, cloudflare_routes)
+
+    if (Array.isArray(updated_cloudflare_routes) && updated_cloudflare_routes.length) {
+      console.log(updated_cloudflare_routes)
+      await updateCloudflareWorkerRoutes(updated_cloudflare_routes)
+    }
 
     const processFile = createFileProcessor(buildDir, disableGeneratedPolicies)
 
