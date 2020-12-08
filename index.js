@@ -29,6 +29,7 @@ module.exports = {
       if (!res.includes('index') && !res.includes('fonts') && !res.includes('files') && !res.includes('images')) {
         const staging_pattern = `staging.cfms.org/${res}`
         const production_pattern = `cfms.org/${res}`
+        const www_pattern = `www.cfms.org/${res}`
         if (!cloudflare_paths.includes(staging_pattern)) {
           cloudflare_paths.push(staging_pattern)
           cloudflare_paths.push(`https://${staging_pattern}`)
@@ -36,6 +37,10 @@ module.exports = {
         if (!cloudflare_paths.includes(production_pattern)) {
           cloudflare_paths.push(production_pattern)
           cloudflare_paths.push(`https://${production_pattern}`)
+        }
+        if (!cloudflare_paths.includes(www_pattern)) {
+          cloudflare_paths.push(www_pattern)
+          cloudflare_paths.push(`https://${www_pattern}`)
         }
       }
     })
